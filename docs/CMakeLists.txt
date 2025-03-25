@@ -2,7 +2,7 @@ if( HAVE_DOCS_MARKDOWN )
   list( APPEND fiat_doc_builders markdown )
 endif()
 
-if( HAVE_DOCS_PDF )
+if( HAVE_DOCS_LATEXPDF )
   list( APPEND fiat_doc_builders latexpdf )
 endif()
 

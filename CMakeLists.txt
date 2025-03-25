@@ -58,7 +58,7 @@ ecbuild_add_option( FEATURE DOCS_HTML
                     DEFAULT OFF
                     DESCRIPTION "Build HTML documentation" )
 
-ecbuild_add_option( FEATURE DOCS_PDF
+ecbuild_add_option( FEATURE DOCS_LATEXPDF
                     DEFAULT OFF
                     DESCRIPTION "Build PDF documentation" )
 
