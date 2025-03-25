@@ -1,0 +1,43 @@
+name: Check Docs
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths:
+    - '../../docs/**'
+
+jobs:
+  Check_docs:
+    strategy:
+      fail-fast: false  # false: try to complete all jobs
+      matrix:
+        artefact_type: [ html, markdown, latexpdf ]
+        sub_project: [ docs/fiat/drhook ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Caching pip dependencies
+      - run: pip install -r docs/requirements.txt
+
+      - name: Install latexmk
+        if: contains(matrix.artefact_type, 'latexpdf')
+        run: sudo apt install -y latexmk texlive-latex-extra
+
+      - name: CMake configure
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
+      - name: Make ${{ matrix.artefact_type }}
+        run: make doc_${{ sub_project }}_${{ matrix.artefact_type }}
+
+      - name: Check diff
+        if: contains(matrix.artefact_type, 'markdown')
+        # Don't check latexpdf or drhook/_build/html as they contain version hashes etc
+        # They get rebuilt as part of cd, so just a ci check that they're not broken is fine
+        run: git diff --exit-code  -- ${{ sub_project }}/_build/markdown
