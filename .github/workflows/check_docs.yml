@@ -34,11 +34,11 @@ jobs:
           cmake ..
 
       # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
-      - name: Make ${{ matrix.artefact_type }}
-        run: make doc_${{ sub_project }}_${{ matrix.artefact_type }}
+      - name: Make Docs
+        run: make doc_${{ matrix.sub_project }}_${{ matrix.artefact_type }}
 
       - name: Check diff
         if: contains(matrix.artefact_type, 'markdown')
         # Don't check latexpdf or drhook/_build/html as they contain version hashes etc
         # They get rebuilt as part of cd, so just a ci check that they're not broken is fine
-        run: git diff --exit-code  -- ${{ sub_project }}/_build/markdown
+        run: git diff --exit-code  -- ${{ matrix.sub_project }}/_build/markdown
