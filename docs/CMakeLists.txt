@@ -12,8 +12,8 @@ endif()
 
 foreach( builder IN LISTS fiat_doc_builders )
   foreach( filepath fiat/drhook )
-  #TODO: Get last bit of project path to gen target name
-    add_custom_target( doc_drhook_${builder}
+    cmake_path(GET filepath FILENAME filename)
+    add_custom_target( doc_${filename}_${builder}
         COMMAND sphinx-build -M ${builder} . _build
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${filepath}
         )
