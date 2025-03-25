@@ -34,6 +34,7 @@ jobs:
           self_test: false
           os: ubuntu-latest
           dependencies: ecmwf/ecbuild@master
+      - run: echo "${{ runner.temp }}/install/ecbuild/bin" >> "$GITHUB_PATH"
 
       - name: Configure
         run: |
@@ -43,7 +44,9 @@ jobs:
 
       # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
       - name: Make Docs
-        run: make doc_${{ matrix.sub_project }}_${{ matrix.artefact_type }}
+        run: |
+          export SUB_PROJECT_SHORT=$(echo "docs/fiat/drhook" | awk -F/ '{print $NF}')
+          make doc_${SUB_PROJECT_SHORT}_${{ matrix.artefact_type }}
 
       - name: Check diff
         if: contains(matrix.artefact_type, 'markdown')
