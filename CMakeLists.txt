@@ -50,6 +50,18 @@ ecbuild_add_option( FEATURE WARNINGS
                     DEFAULT ON
                     DESCRIPTION "Add warnings to compiler" )
 
+ecbuild_add_option( FEATURE DOCS_MARKDOWN
+                    DEFAULT OFF
+                    DESCRIPTION "Build Markdown documentation" )
+
+ecbuild_add_option( FEATURE DOCS_HTML
+                    DEFAULT OFF
+                    DESCRIPTION "Build HTML documentation" )
+
+ecbuild_add_option( FEATURE DOCS_PDF
+                    DEFAULT OFF
+                    DESCRIPTION "Build PDF documentation" )
+
 ecbuild_find_package( NAME Realtime QUIET )
 
 ### Sources
@@ -57,6 +69,7 @@ ecbuild_find_package( NAME Realtime QUIET )
 include( fiat_compiler_warnings )
 add_subdirectory(src)
 add_subdirectory(share)
+add_subdirectory(docs)
 
 ### Tests
 
