@@ -27,17 +27,19 @@ jobs:
         if: contains(matrix.artefact_type, 'latexpdf')
         run: sudo apt install -y latexmk texlive-latex-extra
 
-      - name: CMake configure
+      - name: Install ecbuild
         uses: ecmwf/build-package@v2
         with:
-          self_build: true
+          self_build: false
           self_test: false
           os: ubuntu-latest
           dependencies: ecmwf/ecbuild@master
-          cmake_options: |
-            -DENABLE_DOCS_MARKDOWN=ON
-            -DENABLE_DOCS_MARKDOWN=ON
-            -DENABLE_DOCS_MARKDOWN=ON
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          ecbuild ..
 
       # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
       - name: Make Docs
