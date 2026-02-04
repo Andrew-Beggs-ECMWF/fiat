@@ -1,11 +1,16 @@
 name: Check Docs
 
 on:
+  # Trigger the workflow for PRs to "main" & "develop",
+  # when the docs or docs workflows are changed
   pull_request:
     branches: [ "main", "develop" ]
     paths:
     - 'docs/**'
     - '.github/workflows/check_docs.yml'
+
+  # Allow workflow to be dispatched on demand
+  workflow_dispatch: ~
 
 jobs:
   Check_docs:
