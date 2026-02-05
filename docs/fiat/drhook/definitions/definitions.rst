@@ -126,7 +126,7 @@ EC_HOST_NAME_MAX
 Value
 ^^^^^
 
-:c:`HOST_NAME_MAX`
+:c:`HOST_NAME_MAX`, or :c:`512` if :c:`HOST_NAME_MAX` is not defined.
 
 Purpose
 ^^^^^^^
@@ -137,25 +137,3 @@ Preprocessor Guards
 ^^^^^^^^^^^^^^^^^^^
 
 :c:`defined(HOST_NAME_MAX)`
-
-.. ###############################################
-
-.. _EC_HOST_NAME_MAX:
-
-EC_HOST_NAME_MAX
-----------------
-
-Value
-^^^^^
-
-:c:`512`
-
-Purpose
-^^^^^^^
-
-Used to set the max size of char arrays for node HOSTNAME.
-
-Preprocessor Guards
-^^^^^^^^^^^^^^^^^^^
-
-:c:`!defined(HOST_NAME_MAX)`
