@@ -1356,7 +1356,9 @@ Notes
 
 Any non-zero valid integer value will be treated as ``1``.
 
-If this option isn't specified and :ref:`DR_HOOK_NVTX <DR_HOOK_NVTX>` is disabled, then it will default to ``0``. If :ref:`DR_HOOK_NVTX <DR_HOOK_NVTX>` is enabled, then :ref:`DR_HOOK_STRICT_REGIONS <DR_HOOK_STRICT_REGIONS>` will be enabled regardless of the value given.
+.. For some reason the ``0`` must have the "." escaped after it or the latexpdf renders as ``0`.
+
+If this option isn't specified and :ref:`DR_HOOK_NVTX <DR_HOOK_NVTX>` or :ref:`DR_HOOK_ROCTX <DR_HOOK_ROCTX>` are disabled, then it will default to ``0``\. If :ref:`DR_HOOK_NVTX <DR_HOOK_NVTX>` or :ref:`DR_HOOK_ROCTX <DR_HOOK_ROCTX>` are enabled, then :ref:`DR_HOOK_STRICT_REGIONS <DR_HOOK_STRICT_REGIONS>` will be enabled regardless of the value given.
 
 .. ###############################################
 
@@ -1448,6 +1450,97 @@ A value less than ``0`` will be set to the definition of ``nvtx_SWT_default``, t
 The size is limited to the size of :c:`double`.
 
 If this option isn't specified, then it will default to the definition of ``nvtx_SWT_default``.
+
+.. ###############################################
+
+.. _DR_HOOK_ROCTX:
+
+DR_HOOK_ROCTX
+------------
+
+Valid Values
+^^^^^^^^^^^^
+| valid_value ::= '0' | '1'
+
+Purpose
+^^^^^^^
+Specifies if ROCTX should be enabled at runtime or not.
+
+Notes
+^^^^^
+.. todo:: Link the ENABLEDR_HOOK_ROCTX compile time flag
+
+Enables AMD's `ROCTX <https://rocm.docs.amd.com/projects/roctracer/en/latest/reference/roctx-spec.html>`_ at runtime. This assumes that ROCTX has been enabled and requested at compile time of \drhook using :ref:`ENABLEDR_HOOK_ROCTX <ENABLEDR_HOOK_ROCTX>`.
+
+If :ref:`DR_HOOK_ROCTX <DR_HOOK_ROCTX>` is enabled, then :ref:`DR_HOOK_STRICT_REGIONS <DR_HOOK_STRICT_REGIONS>` will also be enabled. It will also enable ``walltime`` and ``count`` from :ref:`DR_HOOK_OPT <DR_HOOK_OPT>`.
+
+Setting ``DR_HOOK_TIMELINE`` to a non-zero value also causes \drhook to check the following options:
+
+* :ref:`DR_HOOK_ROCTX_SPAM_CALL_COUNT <DR_HOOK_ROCTX_SPAM_CALL_COUNT>`
+* :ref:`DR_HOOK_ROCTX_SPAM_WT <DR_HOOK_ROCTX_SPAM_WT>`
+
+Any non-zero valid integer value will be treated as ``1``.
+
+If this option isn't specified, then it will default to ``0``.
+
+.. ###############################################
+
+.. _DR_HOOK_ROCTX_SPAM_CALL_COUNT:
+
+DR_HOOK_ROCTX_SPAM_CALL_COUNT
+----------------------------
+
+Valid Values
+^^^^^^^^^^^^
+| valid_value ::= <digit> | <valid_value> <digit> | <valid_value> '0'
+| digit ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+Purpose
+^^^^^^^
+Specifies the spam call count for ROCTX.
+
+Notes
+^^^^^
+Spam call count is the number of times a \drhook region has to be called, without a cumulative runtime longer than the :ref:`DR_HOOK_ROCTX_SPAM_WT <DR_HOOK_ROCTX_SPAM_WT>` time, for \drhook to skip subsequent calls of that region for the functionality of ROCTX. It will not skip core \drhook profiling.
+
+This option is only available if ROCTX is enabled via :ref:`DR_HOOK_ROCTX <DR_HOOK_ROCTX>`.
+
+A value less than ``0`` will be set to the definition of ``roctx_SCC_default``, typically ``10``. While it is possible to specify ``0``, this will effectively disable ROCTX as all regions will be skipped - unless they can accumulate sufficient runtime to satisfy :ref:`DR_HOOK_ROCTX_SPAM_WT <DR_HOOK_ROCTX_SPAM_WT>` in their first call.
+
+The size is limited to the size of :c:`int`.
+
+If this option isn't specified, then it will default to the definition of ``roctx_SCC_default``.
+
+.. ###############################################
+
+.. _DR_HOOK_ROCTX_SPAM_WT:
+
+DR_HOOK_ROCTX_SPAM_WT
+--------------------
+
+Valid Values
+^^^^^^^^^^^^
+| valid_value ::= <number> | 'number' '.' <number>
+| number ::= <digit> | <double_part> <digit>
+| digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+Purpose
+^^^^^^^
+Specifies the spam wall time for ROCTX.
+
+Notes
+^^^^^
+Spam wall time is the cumulative runtime a \drhook region must have if it is not to be skipped for ROCTX functionality after exceeding :ref:`DR_HOOK_ROCTX_SPAM_CALL_COUNT <DR_HOOK_ROCTX_SPAM_CALL_COUNT>`. It will not skip core \drhook profiling.
+
+This option is only available if ROCTX is enabled via :ref:`DR_HOOK_ROCTX <DR_HOOK_ROCTX>`.
+
+:ref:`DR_HOOK_ROCTX_SPAM_WT <DR_HOOK_ROCTX_SPAM_WT>` is measured in seconds.
+
+A value less than ``0`` will be set to the definition of ``roctx_SWT_default``, typically ``0.001``.
+
+The size is limited to the size of :c:`double`.
+
+If this option isn't specified, then it will default to the definition of ``roctx_SWT_default``.
 
 .. ###############################################
 
