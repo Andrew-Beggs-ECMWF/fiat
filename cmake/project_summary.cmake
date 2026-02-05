@@ -23,5 +23,15 @@ ecbuild_info( "MPI (export MPI_HOME to correct MPI implementation)" )
 ecbuild_info( "    MPI_Fortran_INCLUDE_DIRS  : [${MPI_Fortran_INCLUDE_DIRS}]" )
 ecbuild_info( "    MPI_Fortran_LIBRARIES     : [${MPI_Fortran_LIBRARIES}]" )
 ecbuild_info( "    MPIEXEC                   : [${MPIEXEC}]" )
+
+if( HAVE_DR_HOOK_NVTX )
+ecbuild_info( "NVTX_LIBRARIES                : [${NVTX_LIBRARIES}]" )
+endif()
+if( HAVE_DR_HOOK_ROCTX )
+ecbuild_info( "ROCTX" )
+ecbuild_info( "    ROCTX_LIBRARIES                : [${ROCTX_LIBRARIES}]" )
+ecbuild_info( "    ROCTX_INCLUDE_DIRS             : [${ROCTX_INCLUDE_DIRS}]" )
+endif()
+
 ecbuild_info( "---------------------------------------------------------" )
 

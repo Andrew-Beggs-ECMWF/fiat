@@ -1,4 +1,5 @@
 # (C) Copyright 2020- ECMWF.
+# (C) Copyright 2024- Meteo-France.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -22,12 +23,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 ### Options
 
 ecbuild_add_option( FEATURE OMP
-                    DESCRIPTION "support for OpenMP shared memory parallelism"
+                    DESCRIPTION "Support for OpenMP shared memory parallelism"
                     REQUIRED_PACKAGES "OpenMP COMPONENTS Fortran" )
 
 ecbuild_add_option( FEATURE MPI
                     DESCRIPTION "Support for MPI distributed parallelism"
                     REQUIRED_PACKAGES "MPI COMPONENTS Fortran" )
+
+ecbuild_add_option( FEATURE DR_HOOK_PAPI
+                    DEFAULT OFF
+                    DESCRIPTION "Support for HW counters in DR_HOOK via PAPI"
+                    REQUIRED_PACKAGES "PAPI")
 
 ecbuild_find_package( fckit QUIET )
 ecbuild_add_option( FEATURE FCKIT
@@ -40,11 +46,15 @@ ecbuild_add_option( FEATURE DR_HOOK_MULTI_PRECISION_HANDLES
 
 ecbuild_add_option( FEATURE DOUBLE_PRECISION
                     DEFAULT ON
-                    DESCRIPTION "Compilation of parkind_dp" )
+                    DESCRIPTION "Support for Double Precision" )
 
 ecbuild_add_option( FEATURE SINGLE_PRECISION
                     DEFAULT ON
-                    DESCRIPTION "Compilation of parkind_sp" )
+                    DESCRIPTION "Support for Single Precision" )
+
+ecbuild_add_option( FEATURE DUMMY_MPI_HEADER
+                    DEFAULT ON
+                    DESCRIPTION "[DANGEROUS] Install a dummy MPI header" )
 
 ecbuild_add_option( FEATURE WARNINGS
                     DEFAULT ON
@@ -61,6 +71,22 @@ ecbuild_add_option( FEATURE DOCS_HTML
 ecbuild_add_option( FEATURE DOCS_LATEXPDF
                     DEFAULT OFF
                     DESCRIPTION "Build PDF documentation" )
+
+if(CMAKE_C_COMPILER_ID STREQUAL "PGI" OR CMAKE_C_COMPILER_ID STREQUAL "NVHPC" )
+    set (DEFAULT_DR_HOOK_NVTX ON)
+else()
+    set (DEFAULT_DR_HOOK_NVTX OFF)
+endif()
+ecbuild_add_option( FEATURE DR_HOOK_NVTX
+                    DEFAULT ${DEFAULT_DR_HOOK_NVTX}
+                    DESCRIPTION "Support for NVTX in DR_HOOK"
+                    REQUIRED_PACKAGES NVTX )
+
+set (DEFAULT_DR_HOOK_ROCTX OFF)
+ecbuild_add_option( FEATURE DR_HOOK_ROCTX
+                    DEFAULT ${DEFAULT_DR_HOOK_ROCTX}
+                    DESCRIPTION "Support for ROCTX in DR_HOOK"
+                    REQUIRED_PACKAGES ROCTX )
 
 ecbuild_find_package( NAME Realtime QUIET )
 
