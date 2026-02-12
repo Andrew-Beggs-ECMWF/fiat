@@ -3,17 +3,27 @@ name: Build Docs
 on:
   # Trigger the workflow for PRs to "main" & "develop",
   # when the docs or docs workflows are changed
+  # N.b. Workflows will not run on pull_request activity
+  # if the pull request has a merge conflict. The merge
+  # conflict must be resolved first.
   pull_request:
     branches: [ "main", "develop" ]
     paths:
     - 'docs/**'
     - 'build_docs.yml'
 
+  # Used to trigger the CD of the built docs
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'docs/**'
+      - 'build_docs.yml'
+
   # Allow workflow to be dispatched on demand
   workflow_dispatch: ~
 
 jobs:
-  Check_docs:
+  Build_docs:
     strategy:
       fail-fast: false  # false: try to complete all jobs
       matrix:
@@ -29,7 +39,7 @@ jobs:
       - run: pip install -r docs/requirements.txt
 
       - name: Install latexmk
-        if: contains(matrix.artefact_type, 'latexpdf')
+        if: matrix.artefact_type == 'latexpdf'
         run: sudo apt install -y latexmk texlive-latex-extra
 
       - name: Install ecbuild
@@ -56,8 +66,42 @@ jobs:
           export SUB_PROJECT_SHORT=$(echo "${{ matrix.sub_project }}" | awk -F/ '{print $NF}')
           make doc_${SUB_PROJECT_SHORT}_${{ matrix.artefact_type }}
 
-      - name: Check diff
-        if: contains(matrix.artefact_type, 'markdown')
-        # Don't check latexpdf or drhook/_build/html as they contain version hashes etc
-        # They get rebuilt as part of cd, so just a ci check that they're not broken is fine
-        run: git diff --exit-code  -- ${{ matrix.sub_project }}/_build/markdown
+      - name: Upload Artefact
+        uses: actions/upload-artifact@v6.0.0
+        if: github.event_name == 'push'
+        with:
+          name: '${{ matrix.sub_project }}/${{ matrix.artefact_type }}'
+          # Only the one artefact from this matrix.artefact_type has been built, so this is fine
+          path: '${{ matrix.sub_project }}/_build/**'
+          if-no-files-found: 'error'
+
+  Deploy_docs:
+    strategy:
+      fail-fast: false  # false: try to complete all jobs
+      matrix:
+        artefact_type: [ html, markdown, latexpdf ]
+        sub_project: [ docs/fiat/drhook ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: Build_docs
+    steps:
+      - name: Download Artefact
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: '${{ matrix.sub_project }}/${{ matrix.artefact_type }}'
+
+      - name: Deploy html
+        if: matrix.artefact_type == 'html'
+#        push to site
+        run: ls -R $GITHUB_WORKSPACE
+
+      - name: Deploy markdown
+        if: matrix.artefact_type == 'markdown'
+#        if changes, commit & push
+#       could use 'git diff --exit-code  -- ${{ matrix.sub_project }}/_build/markdown'
+        run: ls -R $GITHUB_WORKSPACE
+
+      - name: Deploy latexpdf
+        if: matrix.artefact_type == 'latexpdf'
+#        publish to confluence
+        run: ls -R $GITHUB_WORKSPACE
