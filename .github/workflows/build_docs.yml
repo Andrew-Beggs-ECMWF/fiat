@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload Artefact
         uses: actions/upload-artifact@v6.0.0
-        if: github.event_name == 'push'
+#        if: github.event_name == 'push'
         with:
           name: '${{ matrix.sub_project }}/${{ matrix.artefact_type }}'
           # Only the one artefact from this matrix.artefact_type has been built, so this is fine
@@ -84,7 +84,7 @@ jobs:
         artefact_type: [ html, markdown, latexpdf ]
         sub_project: [ docs/fiat/drhook ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     needs: Build_docs
     steps:
       - name: Download Artefact
