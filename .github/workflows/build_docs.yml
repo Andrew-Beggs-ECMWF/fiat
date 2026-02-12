@@ -40,7 +40,9 @@ jobs:
 
       - name: Install latexmk
         if: matrix.artefact_type == 'latexpdf'
-        run: sudo apt install -y latexmk texlive-latex-extra
+        run: |
+          sudo apt update
+          sudo apt install -y latexmk texlive-latex-extra
 
       - name: Install ecbuild
         uses: ecmwf/build-package@v2
