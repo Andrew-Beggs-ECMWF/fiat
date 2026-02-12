@@ -63,10 +63,11 @@ jobs:
 
       # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
       - name: Make Docs
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
         run: |
           cd build
-          export SUB_PROJECT_SHORT=$(echo "${{ matrix.sub_project }}" | awk -F/ '{print $NF}')
-          make doc_${SUB_PROJECT_SHORT}_${{ matrix.artefact_type }}
+          make doc_${SUB_PROJECT##*/}_${{ matrix.artefact_type }}
 
       - name: Upload Artefact
         uses: actions/upload-artifact@v6.0.0
