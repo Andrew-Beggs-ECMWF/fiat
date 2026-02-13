@@ -82,7 +82,7 @@ jobs:
         with:
           name: ${{ steps.gen_name.outputs.artefact_name }}
           # Only the one artefact from this matrix.artefact_type has been built, so this is fine
-          path: ${{ matrix.sub_project }}/_build/${{ case(matrix.artefact_type == 'latexpdf', '*.pdf', '**') }}
+          path: ${{ matrix.sub_project }}/_build/${{ case(matrix.artefact_type == 'latexpdf', 'latex/*.pdf', format('{0}/**/*', matrix.artefact_type)) }}
           if-no-files-found: 'error'
 
   Deploy_docs:
