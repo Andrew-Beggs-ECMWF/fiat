@@ -56,6 +56,7 @@ jobs:
       - name: Configure
         env:
           ARTEFACT_TYPE: ${{ matrix.artefact_type }}
+        # This uses a parameter expansion to convert to uppercase
         run: |
           mkdir build
           cd build
@@ -65,17 +66,23 @@ jobs:
       - name: Make Docs
         env:
           SUB_PROJECT: ${{ matrix.sub_project }}
+        # This uses a parameter expansion to strip the leading path
         run: |
           cd build
           make doc_${SUB_PROJECT##*/}_${{ matrix.artefact_type }}
+
+      - name: Generate Artefact Name
+        id: gen_name
+        # This uses a parameter expansion to replace the / with _
+        run: echo "artefact_name=${${{matrix.sub_project }}//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Artefact
         uses: actions/upload-artifact@v6.0.0
 #        if: github.event_name == 'push'
         with:
-          name: '${{ matrix.sub_project }}/${{ matrix.artefact_type }}'
+          name: ${{ steps.gen_name.outputs.artefact_name }}
           # Only the one artefact from this matrix.artefact_type has been built, so this is fine
-          path: '${{ matrix.sub_project }}/_build/**'
+          path: ${{ matrix.sub_project }}/_build/${{ case(matrix.artefact_type == 'latexpdf', '*.pdf', '**') }}
           if-no-files-found: 'error'
 
   Deploy_docs:
@@ -88,10 +95,18 @@ jobs:
 #    if: github.event_name == 'push'
     needs: Build_docs
     steps:
+      # This step is repeated, but the matrix make it hard to pass outputs across jobs.
+      # It could be done as a map, but outputs need to be defined statically (without using actions).
+      # So the number of outputs would explode as it's the product of the matrix values.
+      - name: Generate Artefact Name
+        id: gen_name
+        # This uses a parameter expansion to replace the / with _
+        run: echo "artefact_name=${${{matrix.sub_project }}//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
+
       - name: Download Artefact
         uses: actions/download-artifact@v7.0.0
         with:
-          name: '${{ matrix.sub_project }}/${{ matrix.artefact_type }}'
+          name: ${{ steps.gen_name.outputs.artefact_name }}
 
       - name: Deploy html
         if: matrix.artefact_type == 'html'
