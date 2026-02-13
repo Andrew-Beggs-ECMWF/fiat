@@ -73,8 +73,10 @@ jobs:
 
       - name: Generate Artefact Name
         id: gen_name
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
         # This uses a parameter expansion to replace the / with _
-        run: echo "artefact_name=${${{matrix.sub_project }}//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
+        run: echo "artefact_name=${SUB_PROJECT//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Artefact
         uses: actions/upload-artifact@v6.0.0
@@ -100,8 +102,10 @@ jobs:
       # So the number of outputs would explode as it's the product of the matrix values.
       - name: Generate Artefact Name
         id: gen_name
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
         # This uses a parameter expansion to replace the / with _
-        run: echo "artefact_name=${${{matrix.sub_project }}//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
+        run: echo "artefact_name=${SUB_PROJECT//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
 
       - name: Download Artefact
         uses: actions/download-artifact@v7.0.0
