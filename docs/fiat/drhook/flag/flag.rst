@@ -463,11 +463,11 @@ Valid Values
 
 Purpose
 ^^^^^^^
-Specifies at which percentage of the maximum value data points should be dropped from profiling outputs.
+Specifies the minimum percentage of total runtime that \drhook regions must occupy to be included in profiling outputs. This can be used to filter out low impact regions.
 
 Notes
 ^^^^^
-If this option isn't specified, then it will default to ``-10``.
+If this option isn't specified, then it will default to ``-10``. This effectively disables filtering \drhook regions by runtime in profiling outputs.
 
 The size is limited to the size of :c:`double`.
 
