@@ -1456,7 +1456,7 @@ If this option isn't specified, then it will default to the definition of ``nvtx
 .. _DR_HOOK_ROCTX:
 
 DR_HOOK_ROCTX
-------------
+-------------
 
 Valid Values
 ^^^^^^^^^^^^
@@ -1488,7 +1488,7 @@ If this option isn't specified, then it will default to ``0``.
 .. _DR_HOOK_ROCTX_SPAM_CALL_COUNT:
 
 DR_HOOK_ROCTX_SPAM_CALL_COUNT
-----------------------------
+-----------------------------
 
 Valid Values
 ^^^^^^^^^^^^
@@ -1516,7 +1516,7 @@ If this option isn't specified, then it will default to the definition of ``roct
 .. _DR_HOOK_ROCTX_SPAM_WT:
 
 DR_HOOK_ROCTX_SPAM_WT
---------------------
+---------------------
 
 Valid Values
 ^^^^^^^^^^^^

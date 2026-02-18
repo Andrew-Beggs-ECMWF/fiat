@@ -153,4 +153,3 @@ jobs:
           )
 
           confluence.attach_file('./DrHook_Manual.pdf', page_id=pid)
-
