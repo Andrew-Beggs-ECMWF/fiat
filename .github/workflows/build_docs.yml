@@ -97,6 +97,12 @@ jobs:
 #    if: github.event_name == 'push'
     needs: Build_docs
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Caching pip dependencies
+      - run: pip install atlassian-python-api
+
       # This step is repeated, but the matrix make it hard to pass outputs across jobs.
       # It could be done as a map, but outputs need to be defined statically (without using actions).
       # So the number of outputs would explode as it's the product of the matrix values.
@@ -126,4 +132,21 @@ jobs:
       - name: Deploy latexpdf
         if: matrix.artefact_type == 'latexpdf'
 #        publish to confluence
-        run: ls -R $GITHUB_WORKSPACE
+        shell: python
+        env:
+          PID: ${{ secrets.PID }}
+          C_TOKEN: ${{ secrets.C_PAT }}
+        run: |
+          import os
+          from atlassian import Confluence
+
+          pid = os.getenv('PID')
+          token = os.getenv('C_TOKEN')
+
+          confluence = Confluence(
+          url="https://confluence.ecmwf.int",
+          token=token
+          )
+
+          confluence.attach_file('./DrHook_Manual.pdf', page_id=pid)
+
