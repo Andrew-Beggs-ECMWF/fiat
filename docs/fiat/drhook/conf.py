@@ -43,6 +43,8 @@ extensions = [
     'sphinx_markdown_builder',
 ]
 
+todo_include_todos = False
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['../../templates']
 
@@ -177,3 +179,23 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+from docutils.nodes import abbreviation
+
+def setup(app):
+
+    def on_builder_inited(app):
+
+        if app.builder.name == "markdown":
+            app.config.todo_include_todos = False
+
+            def pass_node(self, node):
+                pass
+
+            app.add_node(
+                abbreviation,
+                override=True,
+                markdown=(pass_node, pass_node),
+            )
+
+    app.connect("builder-inited", on_builder_inited)
