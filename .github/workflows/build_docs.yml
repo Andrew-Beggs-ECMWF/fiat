@@ -97,11 +97,12 @@ jobs:
 #    if: github.event_name == 'push'
     needs: Build_docs
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip' # Caching pip dependencies
-      - run: pip install atlassian-python-api
+          cache-dependency-path: docs/deploy_requirements.txt
 
       # This step is repeated, but the matrix make it hard to pass outputs across jobs.
       # It could be done as a map, but outputs need to be defined statically (without using actions).
@@ -128,6 +129,9 @@ jobs:
 #        if changes, commit & push
 #       could use 'git diff --exit-code  -- ${{ matrix.sub_project }}/_build/markdown'
         run: ls -R $GITHUB_WORKSPACE
+
+      - run: pip install -r docs/deploy_requirements.txt
+        if: matrix.artefact_type == 'latexpdf'
 
       - name: Deploy latexpdf
         if: matrix.artefact_type == 'latexpdf'
