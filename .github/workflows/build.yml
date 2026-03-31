@@ -218,6 +218,9 @@ jobs:
     - name: Build & Test
       id: build-test
       uses: ecmwf-actions/build-package@v2
+      env:
+        OMPI_ALLOW_RUN_AS_ROOT: 1
+        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
       with:
         self_coverage: ${{ matrix.coverage }}
         force_build: true
