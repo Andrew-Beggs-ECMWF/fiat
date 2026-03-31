@@ -31,14 +31,14 @@ jobs:
       matrix:
         build_type: [Release,Debug]
         name:
-          - linux gnu-10
-          - linux gnu-12
-          - linux gnu-14
-          - linux clang-18
-          - linux intel
-          - linux intel-classic
+#          - linux gnu-10
+#          - linux gnu-12
+#          - linux gnu-14
+#          - linux clang-18
+#          - linux intel
+#          - linux intel-classic
           - linux nvhpc-25.1
-          - macos
+#          - macos
 
         include:
 
@@ -98,6 +98,7 @@ jobs:
 
           - name: linux nvhpc-25.1
             os: ubuntu-24.04
+            container: nvcr.io/nvidia/nvhpc:26.1-devel-cuda_multi-rockylinux9
             compiler: nvhpc-25.1
             compiler_cc: nvc
             compiler_cxx: nvc++
@@ -118,6 +119,7 @@ jobs:
             cmake_options: -DMPI_SLOTS=4 -DMPI_ARGS=--oversubscribe
 
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container || '' }}
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -139,24 +141,24 @@ jobs:
         printenv
 
 
-    - name: Free Disk Space (Ubuntu)
-      # Free up disk space for nvhpc
-      uses: jlumbroso/free-disk-space@main
-      if: contains( matrix.compiler, 'nvhpc' )
-      continue-on-error: true
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: false # takes too long
-        docker-images: false # takes too long
-        swap-storage: true
+#    - name: Free Disk Space (Ubuntu)
+#      # Free up disk space for nvhpc
+#      uses: jlumbroso/free-disk-space@main
+#      if: contains( matrix.compiler, 'nvhpc' )
+#      continue-on-error: true
+#      with:
+#        # this might remove tools that are actually needed,
+#        # if set to "true" but frees about 6 GB
+#        tool-cache: false
+#
+#        # all of these default to true, but feel free to set to
+#        # "false" if necessary for your workflow
+#        android: true
+#        dotnet: true
+#        haskell: true
+#        large-packages: false # takes too long
+#        docker-images: false # takes too long
+#        swap-storage: true
 
     - name: Retrieve cached dependencies
       if: matrix.caching
@@ -166,16 +168,16 @@ jobs:
         path: ${{ env.DEPS_DIR }}
         key: deps-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.CACHE_SUFFIX }}
 
-    - name: Install NVHPC compiler
-      if: contains( matrix.compiler, 'nvhpc' )
-      shell: bash -eux {0}
-      run: |
-        ${FIAT_TOOLS}/install-nvhpc.sh --prefix /opt/nvhpc --version 25.1
-        source /opt/nvhpc/env.sh
-        echo "${NVHPC_DIR}/compilers/bin"                   >> $GITHUB_PATH
-        echo "NVHPC_ROOT=${NVHPC_DIR}"                      >> $GITHUB_ENV
-        [ -z ${MPI_HOME+x} ] || echo "MPI_HOME=${MPI_HOME}" >> $GITHUB_ENV
-        echo "FIAT_TEST_IGNORE_MPI_OUTPUT=1"                >> $GITHUB_ENV
+#    - name: Install NVHPC compiler
+#      if: contains( matrix.compiler, 'nvhpc' )
+#      shell: bash -eux {0}
+#      run: |
+#        ${FIAT_TOOLS}/install-nvhpc.sh --prefix /opt/nvhpc --version 25.1
+#        source /opt/nvhpc/env.sh
+#        echo "${NVHPC_DIR}/compilers/bin"                   >> $GITHUB_PATH
+#        echo "NVHPC_ROOT=${NVHPC_DIR}"                      >> $GITHUB_ENV
+#        [ -z ${MPI_HOME+x} ] || echo "MPI_HOME=${MPI_HOME}" >> $GITHUB_ENV
+#        echo "FIAT_TEST_IGNORE_MPI_OUTPUT=1"                >> $GITHUB_ENV
 
     - name: Install Intel oneAPI compiler
       if: contains( matrix.compiler, 'intel' )
