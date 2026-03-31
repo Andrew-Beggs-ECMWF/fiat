@@ -24,6 +24,9 @@ env:
 jobs:
   ci:
     name: ci
+    defaults:
+      run:
+        shell: bash
 
     strategy:
       fail-fast: false  # false: try to complete all jobs
