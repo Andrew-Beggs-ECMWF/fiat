@@ -137,8 +137,8 @@ jobs:
         if [[ "${{ matrix.os }}" =~ macos ]]; then
           brew install ninja
         else
-          sudo apt-get update
-          sudo apt-get install ninja-build
+          apt-get update
+          apt-get install sudo ninja-build
         fi
 
         printenv
