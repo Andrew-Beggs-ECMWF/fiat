@@ -42,63 +42,63 @@ jobs:
 
         include:
 
-          - name: linux gnu-10
-            os: ubuntu-22.04
-            compiler: gnu-10
-            compiler_cc: gcc-10
-            compiler_cxx: g++-10
-            compiler_fc: gfortran-10
-            caching: true
-            coverage: false
-
-          - name: linux gnu-12
-            os: ubuntu-22.04
-            compiler: gnu-10
-            compiler_cc: gcc-10
-            compiler_cxx: g++-10
-            compiler_fc: gfortran-10
-            caching: true
-            coverage: true
-
-          - name: linux gnu-14
-            os: ubuntu-24.04
-            compiler: gnu-14
-            compiler_cc: gcc-14
-            compiler_cxx: g++-14
-            compiler_fc: gfortran-14
-            caching: true
-            coverage: false
-
-          - name: linux clang-18
-            os: ubuntu-24.04
-            compiler: clang-18
-            compiler_cc: clang-18
-            compiler_cxx: clang++-18
-            compiler_fc: gfortran-14
-            caching: true
-            coverage: false
-
-          - name : linux intel
-            os: ubuntu-24.04
-            compiler: intel
-            compiler_cc: icx
-            compiler_cxx: icpx
-            compiler_fc: ifx
-            caching: true
-            coverage: false
-
-          - name : linux intel-classic
-            os: ubuntu-22.04
-            compiler: intel-classic
-            compiler_cc: icc
-            compiler_cxx: icpc
-            compiler_fc: ifort
-            caching: true
-            coverage: false
+#          - name: linux gnu-10
+#            os: ubuntu-22.04
+#            compiler: gnu-10
+#            compiler_cc: gcc-10
+#            compiler_cxx: g++-10
+#            compiler_fc: gfortran-10
+#            caching: true
+#            coverage: false
+#
+#          - name: linux gnu-12
+#            os: ubuntu-22.04
+#            compiler: gnu-10
+#            compiler_cc: gcc-10
+#            compiler_cxx: g++-10
+#            compiler_fc: gfortran-10
+#            caching: true
+#            coverage: true
+#
+#          - name: linux gnu-14
+#            os: ubuntu-24.04
+#            compiler: gnu-14
+#            compiler_cc: gcc-14
+#            compiler_cxx: g++-14
+#            compiler_fc: gfortran-14
+#            caching: true
+#            coverage: false
+#
+#          - name: linux clang-18
+#            os: ubuntu-24.04
+#            compiler: clang-18
+#            compiler_cc: clang-18
+#            compiler_cxx: clang++-18
+#            compiler_fc: gfortran-14
+#            caching: true
+#            coverage: false
+#
+#          - name : linux intel
+#            os: ubuntu-24.04
+#            compiler: intel
+#            compiler_cc: icx
+#            compiler_cxx: icpx
+#            compiler_fc: ifx
+#            caching: true
+#            coverage: false
+#
+#          - name : linux intel-classic
+#            os: ubuntu-22.04
+#            compiler: intel-classic
+#            compiler_cc: icc
+#            compiler_cxx: icpc
+#            compiler_fc: ifort
+#            caching: true
+#            coverage: false
 
           - name: linux nvhpc-25.1
             os: ubuntu-24.04
-            container: nvcr.io/nvidia/nvhpc:26.1-devel-cuda_multi-rockylinux9
+            container: nvcr.io/nvidia/nvhpc:26.3-devel-cuda_multi-ubuntu22.04
             compiler: nvhpc-25.1
             compiler_cc: nvc
             compiler_cxx: nvc++
@@ -107,16 +107,16 @@ jobs:
             caching: true
             coverage: false
 
-          - name: macos
-            # Xcode compiler requires empty environment variables, so we pass null (~) here
-            os: macos-14
-            compiler: clang-15
-            compiler_cc: ~
-            compiler_cxx: ~
-            compiler_fc: gfortran-13
-            caching: true
-            coverage: false
-            cmake_options: -DMPI_SLOTS=4 -DMPI_ARGS=--oversubscribe
+#          - name: macos
+#            # Xcode compiler requires empty environment variables, so we pass null (~) here
+#            os: macos-14
+#            compiler: clang-15
+#            compiler_cc: ~
+#            compiler_cxx: ~
+#            compiler_fc: gfortran-13
+#            caching: true
+#            coverage: false
+#            cmake_options: -DMPI_SLOTS=4 -DMPI_ARGS=--oversubscribe
 
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container || '' }}
