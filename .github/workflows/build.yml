@@ -34,6 +34,7 @@ jobs:
       matrix:
         build_type: [Release,Debug]
         lib_type: [Shared,Static]
+        feature: [None,DR_HOOK_NVTX] #[None,DR_HOOK_PAPI,DR_HOOK_NVTX,DR_HOOK_ROCTX]
         name:
 #          - linux gnu-10
 #          - linux gnu-12
@@ -235,7 +236,7 @@ jobs:
         dependency_cmake_options: |
           ecmwf/eckit: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTS=OFF -DENABLE_ECKIT_CMD=OFF -DENABLE_ECKIT_SQL=OFF -DENABLE_MPI=ON -DENABLE_OMP=OFF"
           ecmwf/fckit: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTS=OFF"
-        cmake_options: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=${{ matrix.lib_type == 'Shared' && 'ON' || 'OFF' }} ${{ matrix.cmake_options }} -DENABLE_MPI=ON"
+        cmake_options: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=${{ matrix.lib_type == 'Shared' && 'ON' || 'OFF' }} ${{ case(matrix.feature == 'None', '', format('-DENABLE_{0}=ON', matrix.feature)) }} ${{ matrix.cmake_options }} -DENABLE_MPI=ON"
         ctest_options: "${{ matrix.ctest_options }}"
 
 #    - name: Verify tools
