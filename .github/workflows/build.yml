@@ -136,6 +136,9 @@ jobs:
         echo "CXX=${{ matrix.compiler_cxx }}"   >> $GITHUB_ENV
         echo "FC=${{ matrix.compiler_fc }}"     >> $GITHUB_ENV
 
+        if [[ "${{ matrix.feature }}" == "DR_HOOK_NVTX" ]]; then
+          echo "/usr/lib/nsight-systems/bin" >> "$GITHUB_PATH"
+        fi
         if [[ "${{ matrix.os }}" =~ macos ]]; then
           brew install ninja
         else
