@@ -33,6 +33,7 @@ jobs:
 
       matrix:
         build_type: [Release,Debug]
+        lib_type: [Shared,Static]
         name:
 #          - linux gnu-10
 #          - linux gnu-12
@@ -234,7 +235,7 @@ jobs:
         dependency_cmake_options: |
           ecmwf/eckit: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTS=OFF -DENABLE_ECKIT_CMD=OFF -DENABLE_ECKIT_SQL=OFF -DENABLE_MPI=ON -DENABLE_OMP=OFF"
           ecmwf/fckit: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTS=OFF"
-        cmake_options: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.cmake_options }} -DENABLE_MPI=ON"
+        cmake_options: "-G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=${{ matrix.lib_type == 'Shared' && 'ON' || 'OFF' }} ${{ matrix.cmake_options }} -DENABLE_MPI=ON"
         ctest_options: "${{ matrix.ctest_options }}"
 
 #    - name: Verify tools
