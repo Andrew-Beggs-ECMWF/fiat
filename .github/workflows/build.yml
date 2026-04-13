@@ -140,7 +140,7 @@ jobs:
           wget https://github.com/Kitware/CMake/releases/download/v4.3.1/cmake-4.3.1-linux-x86_64.sh
           chmod +x cmake-4.3.1-linux-x86_64.sh
           ./cmake-4.3.1-linux-x86_64.sh --skip-license
-          echo "/cmake-4.3.1-linux-aarch64/bin" >> "$GITHUB_PATH"
+          echo "./cmake-4.3.1-linux-aarch64/bin" >> "$GITHUB_PATH"
         fi
         if [[ "${{ matrix.os }}" =~ macos ]]; then
           brew install ninja
