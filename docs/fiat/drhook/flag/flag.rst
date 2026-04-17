@@ -984,6 +984,33 @@ If this option isn't specified, then it will default to ``1``.
 
 .. ###############################################
 
+.. _DR_HOOK_TRAPFPE_SW:
+
+DR_HOOK_TRAPFPE_SW
+-----------------------
+
+Valid Values
+^^^^^^^^^^^^
+| valid_value ::= '0' | '1'
+
+Purpose
+^^^^^^^
+Toggles whether floating point exceptions should be trapped via software or hardware.
+
+Notes
+^^^^^
+This will only be enabled if :ref:`DR_HOOK_TRAPFPE <DR_HOOK_TRAPFPE>` evaluates to ``1``.
+
+When enabled, this will cause \drhook to trap floating point exceptions via software. The check for flags is done when entering and exiting \drhook regions. This is typically used when the platform doesn't support hardware trapping of floating point exceptions, but can be used regardless of platform support.
+
+FPEs to check are set by :ref:`DR_HOOK_TRAPFPE_INVALID <DR_HOOK_TRAPFPE_INVALID>`, :ref:`DR_HOOK_TRAPFPE_DIVBYZERO <DR_HOOK_TRAPFPE_DIVBYZERO>`, and :ref:`DR_HOOK_TRAPFPE_OVERFLOW <DR_HOOK_TRAPFPE_OVERFLOW>`.
+
+Any non-zero valid integer value will be set to ``1``.
+
+If this option isn't specified, then the default value depends on \drhook configuration and system behaviour. If :ref:`DR_HOOK_TRAPFPE <DR_HOOK_TRAPFPE>` is not enabled, then this will default to ``0``. If :ref:`DR_HOOK_TRAPFPE <DR_HOOK_TRAPFPE>` is enabled, then :ref:`DR_HOOK_TRAPFPE_SW <DR_HOOK_TRAPFPE_SW>` will be enabled if the platform does not support hardware trapping of floating point exceptions. This can be disabled by explicitly setting :ref:`DR_HOOK_TRAPFPE_SW <DR_HOOK_TRAPFPE_SW>` to ``0``. If the platform does support hardware trapping of floating point exceptions, then :ref:`DR_HOOK_TRAPFPE_SW <DR_HOOK_TRAPFPE_SW>` defaults to ``0``.
+
+.. ###############################################
+
 .. _DR_HOOK_TRAPFPE_INVALID:
 
 DR_HOOK_TRAPFPE_INVALID
