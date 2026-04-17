@@ -1,0 +1,154 @@
+name: Build Docs
+
+on:
+  # Trigger the workflow for PRs when the docs or docs 
+  # workflows are changed.
+  # N.b. Workflows will not run on pull_request activity
+  # if the pull request has a merge conflict. The merge
+  # conflict must be resolved first.
+  pull_request:
+    paths:
+    - 'docs/**'
+    - 'build_docs.yml'
+
+  # Used to trigger the CD of the built docs
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'docs/**'
+      - 'build_docs.yml'
+
+  # Allow workflow to be dispatched on demand
+  workflow_dispatch: ~
+
+jobs:
+  Build_docs:
+    strategy:
+      fail-fast: false  # false: try to complete all jobs
+      matrix:
+        artefact_type: [ html, markdown, latexpdf ]
+        sub_project: [ docs/fiat/drhook ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Caching pip dependencies
+      - run: pip install -r docs/requirements.txt
+
+      - name: Install latexmk
+        if: matrix.artefact_type == 'latexpdf'
+        run: |
+          sudo apt update
+          sudo apt install -y latexmk texlive-latex-extra
+
+      - name: Install ecbuild
+        uses: ecmwf/build-package@v2
+        with:
+          self_build: false
+          self_test: false
+          os: ubuntu-latest
+          dependencies: ecmwf/ecbuild@master
+      - run: echo "${{ runner.temp }}/install/ecbuild/bin" >> "$GITHUB_PATH"
+
+      - name: Configure
+        env:
+          ARTEFACT_TYPE: ${{ matrix.artefact_type }}
+        # This uses a parameter expansion to convert to uppercase
+        run: |
+          mkdir build
+          cd build
+          ecbuild .. -DENABLE_DOCS_${ARTEFACT_TYPE^^}=ON
+
+      # Don't invoke via CMake to avoid unnecessary machinery. Other tests do that
+      - name: Make Docs
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
+        # This uses a parameter expansion to strip the leading path
+        run: |
+          cd build
+          make doc_${SUB_PROJECT##*/}_${{ matrix.artefact_type }}
+
+      - name: Generate Artefact Name
+        id: gen_name
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
+        # This uses a parameter expansion to replace the / with _
+        run: echo "artefact_name=${SUB_PROJECT//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Artefact
+        uses: actions/upload-artifact@v6.0.0
+#        if: github.event_name == 'push'
+        with:
+          name: ${{ steps.gen_name.outputs.artefact_name }}
+          # Only the one artefact from this matrix.artefact_type has been built, so this is fine
+          path: ${{ matrix.sub_project }}/_build/${{ case(matrix.artefact_type == 'latexpdf', 'latex/*.pdf', format('{0}/**/*', matrix.artefact_type)) }}
+          if-no-files-found: 'error'
+
+  Deploy_docs:
+    strategy:
+      fail-fast: false  # false: try to complete all jobs
+      matrix:
+        artefact_type: [ html, markdown, latexpdf ]
+        sub_project: [ docs/fiat/drhook ]
+    runs-on: ubuntu-latest
+#    if: github.event_name == 'push'
+    needs: Build_docs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Caching pip dependencies
+          cache-dependency-path: docs/deploy_requirements.txt
+
+      # This step is repeated, but the matrix make it hard to pass outputs across jobs.
+      # It could be done as a map, but outputs need to be defined statically (without using actions).
+      # So the number of outputs would explode as it's the product of the matrix values.
+      - name: Generate Artefact Name
+        id: gen_name
+        env:
+          SUB_PROJECT: ${{ matrix.sub_project }}
+        # This uses a parameter expansion to replace the / with _
+        run: echo "artefact_name=${SUB_PROJECT//\//_}_${{ matrix.artefact_type }}" >> "$GITHUB_OUTPUT"
+
+      - name: Download Artefact
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: ${{ steps.gen_name.outputs.artefact_name }}
+
+      - name: Deploy html
+        if: matrix.artefact_type == 'html'
+#        push to site
+        run: ls -R $GITHUB_WORKSPACE
+
+      - name: Deploy markdown
+        if: matrix.artefact_type == 'markdown'
+#        if changes, commit & push
+#       could use 'git diff --exit-code  -- ${{ matrix.sub_project }}/_build/markdown'
+        run: ls -R $GITHUB_WORKSPACE
+
+      - run: pip install -r docs/deploy_requirements.txt
+        if: matrix.artefact_type == 'latexpdf'
+
+      - name: Deploy latexpdf
+        if: matrix.artefact_type == 'latexpdf'
+#        publish to confluence
+        shell: python
+        env:
+          PID: ${{ secrets.PID }}
+          C_TOKEN: ${{ secrets.C_PAT }}
+        run: |
+          import os
+          from atlassian import Confluence
+
+          pid = os.getenv('PID')
+          token = os.getenv('C_TOKEN')
+
+          confluence = Confluence(
+          url="https://confluence.ecmwf.int",
+          token=token
+          )
+
+          confluence.attach_file('./DrHook_Manual.pdf', page_id=pid)
